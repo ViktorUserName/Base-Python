@@ -21,13 +21,13 @@ class Person:
     def get_name(self):
         return self.__name
     
-    def sayHi(self):
+    def say_hi(self):
         print(f'hi {self.__name} age {self.__age}')
     
 person1 = Person("Viktor", "Chiz", 127)
-person1.sayHi()
+person1.say_hi()
 person1.age = 11
-person1.sayHi()
+person1.say_hi()
 print(person1.age)
 
 # person1.setAge(99)
