@@ -45,11 +45,6 @@ INSERT INTO sales (quantity, book_id) VALUES
 (180, 4),  -- Продажи "Murder on the Orient Express"
 (120, 5);  -- Продажи "War and Peace"
 
-SELECT * FROM Books;
-
-SELECT conname, conrelid::regclass, confrelid::regclass
-FROM pg_constraint
-WHERE conrelid = 'Books'::regclass;
 
 SELECT  * FROM Authors
     INNER JOIN Books
