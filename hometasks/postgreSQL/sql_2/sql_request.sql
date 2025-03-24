@@ -108,7 +108,7 @@ SELECT A.first_name, A.last_name, SUM(S.quantity) AS total_sell FROM Authors A
     INNER JOIN Books B ON A.id = B.author_id
     INNER JOIN Sales S ON B.id = S.book_id
     GROUP BY A.id
-        HAVING SUM(S.quantity) = (SELECT MAX(total_sales)
+        HAVING SUM(S.quantity) = (SELECT MAX(total_sell)
                           FROM (SELECT B.author_id, SUM(S.quantity) AS total_sales
                                 FROM Books B
                                 INNER JOIN Sales S ON B.id = S.book_id
