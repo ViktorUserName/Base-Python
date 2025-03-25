@@ -54,6 +54,12 @@ SELECT * FROM Event;
 SELECT * FROM Seats;
 SELECT * FROM Tickets;
 
+SELECT s.id, s.row_number, s.seat_number
+FROM Seats s
+LEFT JOIN Tickets t ON s.id = t.seat_id
+WHERE t.id IS NULL OR t.status = 'canceled';
+
+
 SELECT Tickets.id, Tickets.price, Tickets.status,
        Event.title, Event.date
 from Tickets
