@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teachers List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <h1 class="h1">Teachers</h1>
+    <ul class="disciples">
+        {% for disciplines in disciplines %}
+            <li><a href="/disciplines/{{disciplines.id}}">{{ disciplines.title }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

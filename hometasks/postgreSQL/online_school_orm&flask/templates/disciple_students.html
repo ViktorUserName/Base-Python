@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Teachers List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <h1 class="h1">
+    {% if disciple_students %}
+         {{ disciple_students[0][0] }}
+    </h1>
+        <ul>
+            {% for disciple_student in disciple_students %}
+                <div class="studentUl">
+                    <li>{{ disciple_student[1] }} (ID: {{ disciple_student[2] }})</li>
+                    <p><a href="/disciplines/student/{{disciple_students[2]}}">[Оценки]</a></p>
+                </div>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет студентов для этой дисциплины</p>
+    {% endif %}
+    <div><a href="/">назад</a></div>
+
+</body>
+</html>
