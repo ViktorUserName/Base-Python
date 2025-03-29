@@ -124,7 +124,7 @@ def get_disciple_students(disciple_id):
             'Disciple': discipline.title,
             'Student': {s.name : s.id for s in discipline.student},
         }
-print(get_disciple_students(1))
+# print(get_disciple_students(1))
 
 # ------------------------------------------------------------------
 def get_full_info(student_id):
@@ -137,11 +137,11 @@ def get_full_info(student_id):
             'name': student.name,
             'last_name': student.last_name,
             'disciple':
-                {d.title: [g.grade for g in d.grade if g.student_id == student.id]
+                {d.title: [{'grade':g.grade, 'date': g.date} for g in d.grade if g.student_id == student.id]
                 for d in student.discipline},
-            'grades':[g.grade for g in student.grade_assocs],
+            'grades':[g.date for g in student.grade_assocs],
         }
-
+print(get_full_info(1))
 # def get_grades_by_disciple(disciple_id):
 #     with Session() as session:
 #         discipline = session.query(Discipline).filter(Discipline.id == disciple_id).first()

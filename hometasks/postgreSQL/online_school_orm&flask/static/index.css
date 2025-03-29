@@ -20,3 +20,11 @@
     align-items: center;
     padding: 50px 0 20px 0;
 }
+
+.studentUl {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    gap: 30px;
+    padding-left: 20px;
+}

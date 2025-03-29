@@ -6,8 +6,34 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
-    <h1>
-        hi
+      <h1 class="h1">
+    {% if student_info %}
+         {{ student_info['name'] }}
     </h1>
+        <ul>
+            {% for disciple, grades in student_info['disciple'].items()%}
+                {% if grades %}
+                <div class="studentUl">
+                    <li>{{ disciple }}</li>
+                    <ul>
+                    {% for entry in grades %}
+                        <li>Оценка: {{ entry['grade'] }} — Дата: {{ entry['date'] }}</li>
+                    {% endfor %}
+                    </ul>
+
+                </div>
+
+<!--  --------------------------------------------------          -->
+                {% else %}
+                <p>{{disciple}}: Нет еще оценок</p>
+                {% endif %}
+<!--  --------------------------------------------------          -->
+
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет студентов для этой дисциплины</p>
+    {% endif %}
+    <div><a href="javascript:history.back()">назад</a></div>
 </body>
 </html>
