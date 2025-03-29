@@ -10,14 +10,14 @@ Base = declarative_base()
 
 class Discipline(Base):
     __tablename__ = "disciplies"
-    # __table_args__ = {"schema": "courses"}  # Укажите вашу схему, если она не public
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(30))
 
     teacher_assocs = relationship("TeacherDisciple", back_populates="discipline")
     student_assocs = relationship("DiscipleStudent", back_populates="discipline")
-    grade_assocs   = relationship("Grade", back_populates="discipline")
+    grade   = relationship("Grade", back_populates="discipline")
+    student = relationship("Student",secondary='disciple_student', back_populates="discipline")
 
 
 class Student(Base):
@@ -29,6 +29,7 @@ class Student(Base):
 
     disciple_assocs = relationship("DiscipleStudent", back_populates="student")
     grade_assocs    = relationship("Grade", back_populates="student")
+    discipline = relationship('Discipline', secondary='disciple_student', back_populates="student")
 
 
 class Teacher(Base):
@@ -62,6 +63,7 @@ class DiscipleStudent(Base):
     student = relationship("Student", back_populates="disciple_assocs")
 
 
+
 class Grade(Base):
     __tablename__ = 'grades'
 
@@ -76,7 +78,7 @@ class Grade(Base):
         CheckConstraint('date <= CURRENT_DATE', name='check_date_less_equal_today'),
     )
     student = relationship("Student", back_populates="grade_assocs")
-    discipline = relationship("Discipline", back_populates="grade_assocs")
+    discipline = relationship("Discipline", back_populates="grade")
 
 
 def init_db():
@@ -104,32 +106,49 @@ def get_all_grades_by_disciple(disciple_id):
             .filter(Discipline.id == disciple_id)
     return result
 
-# SELECT disciplies.title, students.name, disciplies.id from disciple_student
-# join disciplies on disciplies.id = disciple_student.disciple_id
-# join students on students.id = disciple_student.student_id
 # def get_disciple_students(disciple_id):
 #     with Session() as session:
-#         result = session.query(Discipline.title, Student.name, Discipline.id) \
-#             .join(Discipline, DiscipleStudent.disciple_id == Discipline.id) \
-#             .join(Student, DiscipleStudent.student_id == Student.id) \
-#             .filter(Discipline.id == disciple_id)
+#         result = session.query(Discipline.title, Student.name, Student.id) \
+#             .join(DiscipleStudent, Discipline.id == DiscipleStudent.disciple_id) \
+#             .join(Student, Student.id == DiscipleStudent.student_id) \
+#             .filter(Discipline.id == disciple_id).all() # Выполнение запроса
 #         return result
 
 def get_disciple_students(disciple_id):
     with Session() as session:
-        result = session.query(Discipline.title, Student.name, Student.id) \
-            .join(DiscipleStudent, Discipline.id == DiscipleStudent.disciple_id) \
-            .join(Student, Student.id == DiscipleStudent.student_id) \
-            .filter(Discipline.id == disciple_id).all() # Выполнение запроса
-        return result
-result1 = get_disciple_students(1)
-for student in result1:
-    print(student)
+        discipline = session.query(Discipline).filter(Discipline.id == disciple_id).first()
+        if not discipline:
+            return None
+        return {
+            'id': discipline.id,
+            'Disciple': discipline.title,
+            'Student': {s.name : s.id for s in discipline.student},
+        }
+print(get_disciple_students(1))
+
 # ------------------------------------------------------------------
+def get_full_info(student_id):
+    with Session() as session:
+        student = session.query(Student).filter(Student.id == student_id).first()
+        if not student:
+            return None
+        return {
+            'id': student.id,
+            'name': student.name,
+            'last_name': student.last_name,
+            'disciple':
+                {d.title: [g.grade for g in d.grade if g.student_id == student.id]
+                for d in student.discipline},
+            'grades':[g.grade for g in student.grade_assocs],
+        }
 
+# def get_grades_by_disciple(disciple_id):
+#     with Session() as session:
+#         discipline = session.query(Discipline).filter(Discipline.id == disciple_id).first()
+#         return {
+#             'disciple': discipline.title,
+#             'grades':[g.grade for g in discipline.grade],
+#         }
 
-
-# def all_teachers():
-#     result = get_all_teachers()
-#     for teacher in result:
-#         print(teacher)
+# print(get_grades_by_disciple(1))
+# print(get_full_info(1))

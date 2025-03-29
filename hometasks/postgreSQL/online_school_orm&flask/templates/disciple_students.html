@@ -8,13 +8,13 @@
 <body>
     <h1 class="h1">
     {% if disciple_students %}
-         {{ disciple_students[0][0] }}
+         {{ disciple_students['Disciple'] }}
     </h1>
         <ul>
-            {% for disciple_student in disciple_students %}
+            {% for student_name, student_id in disciple_students['Student'].items() %}
                 <div class="studentUl">
-                    <li>{{ disciple_student[1] }} (ID: {{ disciple_student[2] }})</li>
-                    <p><a href="/disciplines/student/{{disciple_students[2]}}">[Оценки]</a></p>
+                    <li>{{ student_name }} (ID: {{ student_id }})</li>
+                    <p><a href="/disciplines/student/{{student_id}}">[Оценки]</a></p>
                 </div>
             {% endfor %}
         </ul>
