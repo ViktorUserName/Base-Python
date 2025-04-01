@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, CheckConstraint, text
+
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, CheckConstraint
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.sql import func
 
@@ -17,8 +18,8 @@ class Discipline(Base):
     teacher_assocs = relationship("TeacherDisciple", back_populates="discipline")
     student_assocs = relationship("DiscipleStudent", back_populates="discipline")
     grade   = relationship("Grade", back_populates="discipline")
-    student = relationship("Student",secondary='disciple_student', back_populates="discipline")
-
+    student = relationship("Student", secondary='disciple_student', back_populates="discipline",
+                           overlaps="student_assocs")
 
 class Student(Base):
     __tablename__ = 'students'
@@ -29,7 +30,7 @@ class Student(Base):
 
     disciple_assocs = relationship("DiscipleStudent", back_populates="student")
     grade_assocs    = relationship("Grade", back_populates="student")
-    discipline = relationship('Discipline', secondary='disciple_student', back_populates="student")
+    discipline = relationship('Discipline', secondary='disciple_student', back_populates="student", overlaps="student_assocs")
 
 
 class Teacher(Base):
@@ -59,8 +60,8 @@ class DiscipleStudent(Base):
     disciple_id = Column(Integer, ForeignKey('disciplies.id', ondelete="CASCADE"))
     student_id = Column(Integer, ForeignKey('students.id', ondelete="CASCADE"))
 
-    discipline = relationship("Discipline", back_populates="student_assocs")
-    student = relationship("Student", back_populates="disciple_assocs")
+    discipline = relationship("Discipline", back_populates="student_assocs", overlaps="student,discipline")
+    student = relationship("Student", back_populates="disciple_assocs", overlaps="discipline,student")
 
 
 
@@ -111,7 +112,7 @@ def get_all_grades_by_disciple(disciple_id):
 #         result = session.query(Discipline.title, Student.name, Student.id) \
 #             .join(DiscipleStudent, Discipline.id == DiscipleStudent.disciple_id) \
 #             .join(Student, Student.id == DiscipleStudent.student_id) \
-#             .filter(Discipline.id == disciple_id).all() # Выполнение запроса
+#             .filter(Discipline.id == disciple_id).all()
 #         return result
 
 def get_disciple_students(disciple_id):
@@ -124,9 +125,7 @@ def get_disciple_students(disciple_id):
             'Disciple': discipline.title,
             'Student': {s.name : s.id for s in discipline.student},
         }
-# print(get_disciple_students(1))
 
-# ------------------------------------------------------------------
 def get_full_info(student_id):
     with Session() as session:
         student = session.query(Student).filter(Student.id == student_id).first()
@@ -141,7 +140,25 @@ def get_full_info(student_id):
                 for d in student.discipline},
             'grades':[g.date for g in student.grade_assocs],
         }
-print(get_full_info(1))
+#       CREATE
+# ------------------------------------------------------------------
+def create_grade_for_student(student_id, discipline_id, grade, date):
+    with Session() as session:
+        exists_query = session.query(DiscipleStudent).filter_by(
+            student_id=student_id, disciple_id=discipline_id
+        ).scalar()
+        if not exists_query:
+            print('Такого студента или курса нет')
+
+
+        print(f"Добавление оценки: {grade} для студента ID {student_id} по дисциплине ID {discipline_id}")
+
+        new_grade = Grade(student_id=student_id,disciple_id=discipline_id, grade=grade, date=date)
+        session.add(new_grade)
+        session.commit()
+
+# create_grade_for_student(1,1,6, '2025-03-11')
+
 # def get_grades_by_disciple(disciple_id):
 #     with Session() as session:
 #         discipline = session.query(Discipline).filter(Discipline.id == disciple_id).first()
