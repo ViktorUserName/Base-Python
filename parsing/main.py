@@ -35,4 +35,4 @@ def dowload_manga_images(url, folder='manga_images'):
                 print(f'Сохранено: {img_name}')
 
 
-dowload_manga_images('https://www.mangaread.org/manga/return-of-the-mad-demon/chapter-8/')
+dowload_manga_images('https://www.mangaread.org/manga/return-of-the-mad-demon/chapter-1/')
