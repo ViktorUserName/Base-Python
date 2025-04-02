@@ -2,7 +2,6 @@ import psycopg2
 import bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
-from datetime import datetime
 
 DB_CONFIG = {
     "dbname": "to_do_list",
@@ -76,10 +75,19 @@ def init_db():
 def get_all_tasks():
     with connect_db() as conn, conn.cursor() as cur:
         cur.execute("""
-            SELECT tasks.id, tasks.title, tasks.description, tasks.status, tasks.created_at, users.name 
-            FROM tasks 
-            JOIN users ON tasks.user_id = users.id 
-            WHERE tasks.deleted_at IS NULL;
+            SELECT tasks.id,
+               tasks.title,
+               tasks.description,
+               tasks.status,
+               tasks.created_at,
+               users.name,
+               users.id,
+               COALESCE(json_agg(subtasks.title), '[]') AS subtasks
+                    FROM tasks
+                    JOIN users ON tasks.user_id = users.id
+                    LEFT JOIN subtasks ON tasks.id = subtasks.task_id
+                    WHERE tasks.deleted_at IS NULL
+                    GROUP BY tasks.id, users.id
         """)
 
         tasks_from_db = cur.fetchall()
@@ -92,6 +100,9 @@ def get_all_tasks():
                 "status": task[3],
                 "created_at": task[4],
                 "user_name": task[5],
+                "user_id": task[6],
+                "subtasks": task[7],
+
             })
         return tasks
 
@@ -121,6 +132,46 @@ def get_task_by_user_id(user_id):
                 "user_id": task[6],
             })
         return tasks
+
+def create_new_task(user_id, title, describtion):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute("INSERT INTO tasks (user_id, title, description) VALUES (%s, %s, %s) RETURNING id",
+                    (user_id, title, describtion))
+        task_id = cur.fetchone()[0]
+        conn.commit()
+        return task_id
+
+def update_task(title, description, task_id, user_id):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute("""
+            UPDATE tasks 
+            SET title = %s, description = %s 
+            WHERE id = %s AND user_id = %s AND deleted_at IS NULL 
+            RETURNING id
+        """, (title, description, task_id, user_id))
+        task_id = cur.fetchone()[0]
+        return task_id
+
+def delete_task(task_id, user_id):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute("UPDATE tasks SET deleted_at = CURRENT_TIMESTAMP WHERE id = %s and user_id = %s RETURNING id;",
+                    (task_id, user_id))
+        task_id = cur.fetchone()[0]
+        return task_id
+
+def is_task_belongs_to_user(user_id, task_id):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute(" SELECT 1 FROM tasks WHERE id = %s AND user_id = %s", (task_id, user_id))
+        return cur.fetchone() is not None
+
+def create_subtask_by_task_id(task_id, title):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute("INSERT INTO subtasks (task_id, title) VALUES (%s, %s) RETURNING id;", (task_id, title))
+        subtask_id = cur.fetchone()[0]
+        conn.commit()
+        return subtask_id
+
+
 # ---------------------------------------------
 def hash_password(password):
     salt = bcrypt.gensalt()

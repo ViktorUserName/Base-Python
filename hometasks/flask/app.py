@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager
 import models.db as db
 from routes.public import public_bp
 from routes.privite import private_bp
