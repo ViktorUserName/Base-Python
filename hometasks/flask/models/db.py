@@ -1,4 +1,7 @@
 import psycopg2
+import bcrypt
+from flask_jwt_extended import create_access_token
+from datetime import timedelta
 from datetime import datetime
 
 DB_CONFIG = {
@@ -118,4 +121,36 @@ def get_task_by_user_id(user_id):
                 "user_id": task[6],
             })
         return tasks
+# ---------------------------------------------
+def hash_password(password):
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
+def check_password(password, hashed_password):
+    if not hashed_password:
+        return False
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+def register_user(name, email, password):
+    hashed_password = hash_password(password)
+    with connect_db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute("INSERT INTO users (name, email, password_hash) VALUES (%s, %s, %s) RETURNING id",
+            (name, email, hashed_password))
+            user_id = cur.fetchone()[0]
+            conn.commit()
+            return user_id
+        except psycopg2.Error as e:
+            print(f"Ошибка при регистрации: {e}")
+            return None
+
+def login_user(email, password):
+    with connect_db() as conn, conn.cursor() as cur:
+        cur.execute("SELECT id, password_hash FROM users WHERE email = %s;", (email,))
+        user = cur.fetchone()
+
+        if user and check_password(password, user[1]):
+            access_token = create_access_token(identity=str(user[0]), expires_delta=timedelta(days=1))
+            return access_token
+        return None
+# ---------------------------------------------

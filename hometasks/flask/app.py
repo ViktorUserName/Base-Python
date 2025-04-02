@@ -1,30 +1,43 @@
 from flask import Flask, jsonify, request
 from http import HTTPStatus
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
 import models.db as db
+from routes.public import public_bp
+from routes.privite import private_bp
 
 app = Flask(__name__)
+app.config["JWT_SECRET_KEY"] = "supersecretkey"
+jwt = JWTManager(app)
 
-@app.route('/', methods=['GET'])
-def ping():
-    return jsonify({
-        'message': 'ping was successed',
-    }), HTTPStatus.OK
+app.register_blueprint(public_bp)
+app.register_blueprint(private_bp)
 
-@app.route('/tasks', methods=['GET'])
-def get_all_tasks():
-    tasks = db.get_all_tasks()
-    return jsonify({'tasks': tasks}), HTTPStatus.OK
+# Autification
+# ---------------------------------------------
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    if not data or 'name' not in data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Missing data'}), HTTPStatus.BAD_REQUEST
 
-@app.route('/tasks/<int:user_id>', methods=['GET'])
-def get_task_by_id(user_id):
-    if user_id is None or user_id < 0:
-        return jsonify({'error': 'Task id not found'}), HTTPStatus.BAD_REQUEST
+    user_id = db.register_user(data['name'], data['email'], data['password'])
+    if user_id:
+        return jsonify({'message': 'User registered'}), HTTPStatus.CREATED
+    else:
+        return jsonify({'message': 'User registration failed'}), HTTPStatus.BAD_REQUEST
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    print(data)
+    if not data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Missing data'}), HTTPStatus.UNAUTHORIZED
 
-    task = db.get_task_by_user_id(user_id)
-    if task is None:
-        return jsonify({'error': 'Task not found'}), HTTPStatus.NOT_FOUND
+    access_token = db.login_user(data['email'], data['password'])
+    if access_token:
+        return jsonify({'access_token': access_token}), HTTPStatus.OK
+    else:
+        return jsonify({'message': 'Login failed'}), HTTPStatus.UNAUTHORIZED
 
-    return jsonify({'task': task}), HTTPStatus.OK
 
 # ---------------------------------------------
 def main():
