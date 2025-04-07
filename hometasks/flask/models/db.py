@@ -12,22 +12,22 @@ DB_CONFIG = {
 }
 
 
-def connect_db():
-    return psycopg2.connect(**DB_CONFIG)
+    def connect_db():
+        return psycopg2.connect(**DB_CONFIG)
 
-def init_db():
-    with connect_db() as conn, conn.cursor() as cur:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(30),
-                email VARCHAR(30) UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        """)
+    def init_db():
+        with connect_db() as conn, conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(30),
+                    email VARCHAR(30) UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
 
-        cur.execute("""
+            cur.execute("""
             CREATE TABLE IF NOT EXISTS tasks (
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(100) NOT NULL,
