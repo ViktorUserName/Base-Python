@@ -1,5 +1,3 @@
-from sqlalchemy.exc import NoResultFound
-
 from models.db_models import Categories, Session, Users
 
 

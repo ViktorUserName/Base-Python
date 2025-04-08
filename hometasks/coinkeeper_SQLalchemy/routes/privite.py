@@ -3,8 +3,9 @@ from http import HTTPStatus
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from repositories.categories import create_category
+from repositories.users import update_balance
+from repositories.transactions import create_transaction
 
-# import models.db as db
 
 private_bp = Blueprint('privite', __name__, url_prefix='/privite')
 
@@ -36,3 +37,39 @@ def create_category_route():
 
     except Exception as e:
         return jsonify({"message": str(e)}), HTTPStatus.BAD_REQUEST
+
+
+@private_bp.route('/users', methods=['PATCH'])
+@jwt_required()
+def update_balance_route():
+    user_id = get_jwt_identity()
+    try:
+        data = request.get_json()
+        balance = data.get('balance')
+
+        if balance is None:
+            return jsonify({'message': 'balance is required'}), HTTPStatus.BAD_REQUEST
+
+        result = update_balance(user_id, balance)
+
+        if not result:
+            return jsonify({'message': 'User not found'}), HTTPStatus.NOT_FOUND
+
+        return jsonify({'new_balance': result}), HTTPStatus.OK
+
+    except Exception as e:
+        return jsonify({'message': str(e)}), HTTPStatus.BAD_REQUEST
+
+@private_bp.route('/transactions/<int:category_id>', methods=['POST'])
+@jwt_required()
+def create_transaction_route(category_id):
+    user_id = get_jwt_identity()
+    try:
+        data = request.get_json()
+        transaction = create_transaction(user_id,category_id,data['transaction_type'], data['amount'])
+        if 'error' in transaction:
+            return jsonify(transaction), HTTPStatus.BAD_REQUEST
+        else:
+            return jsonify(transaction), HTTPStatus.CREATED
+    except Exception as e:
+        return jsonify({'message': str(e)}), HTTPStatus.BAD_REQUEST
