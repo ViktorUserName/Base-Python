@@ -1,9 +1,9 @@
 import datetime
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, CheckConstraint, Text, Numeric
-from sqlalchemy.orm import sessionmaker, declarative_base, relationship
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship, scoped_session
 
 
-engine = create_engine("postgresql://postgres:postgres@localhost:5432/courses", echo=True)
+engine = create_engine("postgresql://postgres:postgres@localhost:5432/coinkeeper", echo=True)
 
 Session = sessionmaker(bind=engine)
 Base = declarative_base()
