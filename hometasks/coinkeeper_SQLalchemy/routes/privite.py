@@ -33,7 +33,7 @@ def create_category_route():
         if 'error' in result:
             return jsonify(result), HTTPStatus.BAD_REQUEST
         else:
-            return jsonify(result), HTTPStatus.OK
+            return jsonify(result), HTTPStatus.CREATED
 
     except Exception as e:
         return jsonify({"message": str(e)}), HTTPStatus.BAD_REQUEST
@@ -51,6 +51,7 @@ def update_balance_route():
             return jsonify({'message': 'balance is required'}), HTTPStatus.BAD_REQUEST
 
         result = update_balance(user_id, balance)
+        result = float(result)
 
         if not result:
             return jsonify({'message': 'User not found'}), HTTPStatus.NOT_FOUND

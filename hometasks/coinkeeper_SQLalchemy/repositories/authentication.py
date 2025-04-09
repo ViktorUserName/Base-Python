@@ -2,6 +2,10 @@ import bcrypt
 from flask_jwt_extended import create_access_token
 from datetime import timedelta
 from models.db_models import Users, Session
+# import redis
+
+
+# redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
 
 def hash_password(password):
@@ -34,5 +38,8 @@ def login_user(email, password):
             return None
         if check_password(password, user.password):
             access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(days=1))
+
+            # redis_client.setex(f"jwt:{user.id}", timedelta(days=1), access_token)
+
             return access_token
         return None

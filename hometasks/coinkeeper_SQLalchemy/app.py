@@ -9,7 +9,6 @@ import models.db_models as db
 import repositories.authentication as authentication
 
 
-
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "supersecretkey"
 jwt = JWTManager(app)
