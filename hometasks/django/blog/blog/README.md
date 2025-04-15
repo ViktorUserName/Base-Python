@@ -1,3 +1,5 @@
+Или pip install django psycopg2-binary python-decouple
+
 which python 
 
 install django
