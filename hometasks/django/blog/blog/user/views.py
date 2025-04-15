@@ -11,16 +11,16 @@ from rest_framework_simplejwt.tokens import AccessToken
 CustomUser = get_user_model()
 
 def jwt_required(func):
-    def wrapper(request,*args, **kwargs):
-        token = request.headers.get('Authorization')
+    def wrapper(self, request, *args, **kwargs):  # Добавляем self
+        token = request.META.get('HTTP_AUTHORIZATION')
         if not token:
-            return JsonResponse({'error':'Token is missing'}, status=401)
+            return JsonResponse({'error': 'Token is missing'}, status=401)
         try:
             access_token = token.split(' ')[1]
             AccessToken(access_token)
         except Exception as e:
             return JsonResponse({"error": f"Token is invalid: {str(e)}"}, status=401)
-        return func(request, *args, **kwargs)
+        return func(self, request, *args, **kwargs)  # Добавляем self
     return wrapper
 
 
@@ -36,12 +36,13 @@ class RegisterUserView(View):
             username=data['username'],
             email=data['email'],
             password=make_password(data['password']),
-            role= data.get('role', 'READER'),
+            role= data.get('role', 'Author'),
         )
         user.save()
 
         return JsonResponse({'user': f'create sucses {user.id}'}, status=201)
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LoginUserView(View):
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
