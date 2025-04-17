@@ -15,6 +15,5 @@ class NewModelView(View):
             for item in data
         ]
 
-        # Возвращаем сериализованные данные в JsonResponse
         return JsonResponse({'data': serialized_data})
 # Create your views here.
