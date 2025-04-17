@@ -9,9 +9,11 @@ from django.utils.decorators import method_decorator
 class PostView(View):
     def get(self, request):
         posts = Post.objects.all()
+        
 
         data_serialized = [
             {
+                "post_id": post.id,
                 "title": post.title,
                 "content": post.content
             } for post in posts
@@ -22,10 +24,11 @@ class PostView(View):
         data = json.loads(request.body)
         title = data.get('title')
         content = data.get('content')
+        user_id = data.get('user_id')
         if not title or not content:
             return JsonResponse({'error': 'title and content are required'}, status=400)
 
-        new_post = Post(title=title, content=content)
+        new_post = Post(user_id= user_id, title=title, content=content)
         new_post.save()
 
         return JsonResponse({
@@ -68,3 +71,6 @@ class PostDetailView(View):
             return JsonResponse({'message': 'Post deleted successfully'}, status=200)
         except Post.DoesNotExist:
             return JsonResponse({'error': 'Post not found'}, status=404)
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return JsonResponse({'error': 'Internal server error'}, status=500)
