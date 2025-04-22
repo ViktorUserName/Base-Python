@@ -6,3 +6,6 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
         read_only_fields = ('id', 'author', 'created_at')
+
+    def perform_delete(self):
+        pass

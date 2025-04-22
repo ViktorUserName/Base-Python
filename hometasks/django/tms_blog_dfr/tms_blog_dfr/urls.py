@@ -11,6 +11,7 @@ from user.views import RegisterView, UserMeView
 
 router = DefaultRouter()
 router.register(r'posts', PostViewSet)
+# router.register(r'commets', CommentsViewSet)
 
 
 
