@@ -29,7 +29,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def all_posts(self, request):
         try:
-            posts = Post.objects.all()  
+            posts = Post.objects.all()
             serializer = PostSerializer(posts, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
