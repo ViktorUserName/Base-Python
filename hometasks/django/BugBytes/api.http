@@ -19,8 +19,8 @@ POST localhost:8000/auth/sign-in/ HTTP/1.1
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin"
+  "username": "admin2",
+  "password": "admin2"
 }
 
 ###
@@ -38,3 +38,7 @@ Content-Type: application/json
   "stock": 14,
   "description": "Amazing TV"
 }
+
+###
+GET localhost:8000/api/orders/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2ODIyNTc5LCJpYXQiOjE3NDY4MjIyNzksImp0aSI6IjQxNmIyMDliNWUwODRkNTY5ZGVkMWI2Y2FiMTkyM2VmIiwidXNlcl9pZCI6Mn0.uJmqaOVLCcYu1f5cmfIGUgxi_dJFZQwDmU-kZww2yIA
