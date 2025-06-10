@@ -15,7 +15,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ###
 
-POST localhost:8000/auth/sign-in/ HTTP/1.1
+POST localhost:8001/auth/sign-in/ HTTP/1.1
 Content-Type: application/json
 
 {
@@ -40,9 +40,20 @@ Content-Type: application/json
 }
 
 ###
-GET localhost:8000/api/orders/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2ODI0OTU0LCJpYXQiOjE3NDY4MjQ2NTQsImp0aSI6IjIzYjMzMGZlN2Y0MTQ5ZmM5NGI4NTljYWUzZjAzMTE0IiwidXNlcl9pZCI6Mn0.9lwSikJxYoiNzNLWjHu1o249GJFcTEalzJ-GSOTSV3o
+GET localhost:8001/api/orders/83c67208-0f7c-4cd8-905a-4ddb3c515dbd HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NTY2NDcxLCJpYXQiOjE3NDk1NjYxNzEsImp0aSI6ImUyMDg5ZTA2MWViMDRlMjRhNjNiYjZmZmUyMTJmMzkzIiwidXNlcl9pZCI6Mn0.XgTEVkbA8CGZQVelqPPaEDyJXJb112_1fxYL0cFN5y0
 
+###
+
+PUT localhost:8001/api/orders/83c67208-0f7c-4cd8-905a-4ddb3c515dbd/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5NTY2NDcxLCJpYXQiOjE3NDk1NjYxNzEsImp0aSI6ImUyMDg5ZTA2MWViMDRlMjRhNjNiYjZmZmUyMTJmMzkzIiwidXNlcl9pZCI6Mn0.XgTEVkbA8CGZQVelqPPaEDyJXJb112_1fxYL0cFN5y0
+
+{
+	"status": "Confirmed"
+
+}
 ###
 POST http://localhost:8000/api/orders/ HTTP/1.1
 Content-Type: application/json
