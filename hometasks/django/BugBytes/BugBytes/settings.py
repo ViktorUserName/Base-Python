@@ -35,14 +35,14 @@ REST_FRAMEWORK = {
     # 'DEFAULT_RENDERER_CLASSES': (
     #     'rest_framework.renderers.JSONRenderer',
     # ),
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '2/minute',
-        'products': '2/minute',
-        'orders': '4/minute'
-    }
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '2/minute',
+    #     'products': '2/minute',
+    #     'orders': '4/minute'
+    # }
 }
 
 MIDDLEWARE = [
@@ -127,7 +127,7 @@ SPECTACULAR_SETTINGS = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://178.62.234.8:6379/1",
+        "LOCATION": "redis://",  # <-- поменял IP на localhost
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
